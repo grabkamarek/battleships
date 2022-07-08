@@ -1,0 +1,14 @@
+﻿1. Draw boards
+2. Draw ships
+3. User placing ships
+4. AI placing ships
+5. Player selecting target
+6. AI selecting target
+- random mode until ship hit
+- precision mode around hit ship part until whole ship is destroyed
+7. Draw target hit results
+- no hit => FoW removed, draw water
+- hit => FoW removed, draw ship part, mark it as destroyed
+8. Win condition = all ships destroyed on player's or AI's board
+9. Animations
+10. Battle of AIs
