@@ -1,4 +1,8 @@
-﻿namespace Battleships
+﻿using Battleships.Core;
+using Battleships.GameObjects;
+using Battleships.Rendering;
+
+namespace Battleships
 {
     public class Game
     {

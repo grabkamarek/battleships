@@ -1,4 +1,9 @@
-﻿using System.Text;
+﻿using Battleships.GameObjects;
+using Battleships.GameObjects.Ships;
+using Battleships.Rendering;
+
+using System.Text;
+using Battleships.Core;
 
 namespace Battleships
 {
