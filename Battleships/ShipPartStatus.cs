@@ -1,8 +1,9 @@
-﻿namespace Battleships;
-
-public enum ShipPartStatus
+﻿namespace Battleships
 {
-    Unknown = 0,
-    Ok = 1,
-    Hit = 2,
+    public enum ShipPartStatus
+    {
+        Unknown = 0,
+        Ok = 1,
+        Hit = 2,
+    }
 }

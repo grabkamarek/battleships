@@ -5,7 +5,7 @@
         public Board(Guid id, Vector2DInt origin, int width, int height)
             : base(id, origin, new Vector2DInt(width, height))
         {
-            PlayAreaOrigin = Origin + Vector2DInt.Right + Vector2DInt.Down;
+            PlayAreaOrigin = Origin + GameGlobals.ColumnWidth + Vector2DInt.Down;
             PlayAreaSize = Size;
         }
 

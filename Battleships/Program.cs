@@ -21,6 +21,7 @@ namespace Battleships
 
         private static Game CreateGame()
         {
+            var shipRenderer = new ShipRenderer();
             return new Game(new DateTimeProvider(), new ConsoleRenderer(), new Dictionary<Type, IGameObjectRenderer>
             {
                 {
@@ -30,10 +31,10 @@ namespace Battleships
                     typeof(Board), new BoardRenderer()
                 },
                 {
-                    typeof(Battleship), new BattleshipRenderer()
+                    typeof(Battleship), shipRenderer
                 },
                 {
-                    typeof(Destroyer), new DestroyerRenderer()
+                    typeof(Destroyer), shipRenderer
                 },
             });
         }
@@ -43,9 +44,19 @@ namespace Battleships
             var ships = new List<Ship>();
 
             var shipSize = GameGlobals.Random.Next() % 2 == 0 ? new Vector2DInt(5, 0) : new Vector2DInt(0, 5);
-            var shipOrigin = GameGlobals.ShipPlacementProvider.FindValidOrigin(board.PlayAreaOrigin, board.PlayAreaSize, shipSize,
+            var shipOrigin = GameGlobals.ShipPlacementProvider.FindValidOrigin(board.PlayAreaSize, shipSize,
                 ships.Select(x => x.ShipParts.Select(p => p.position).ToList()).ToList());
-            ships.Add(new Battleship(GameGlobals.IdsProvider.New, shipOrigin, shipSize));
+            ships.Add(new Battleship(GameGlobals.IdsProvider.New, board, shipOrigin, shipSize));
+
+            shipSize = GameGlobals.Random.Next() % 2 == 0 ? new Vector2DInt(3, 0) : new Vector2DInt(0, 3);
+            shipOrigin = GameGlobals.ShipPlacementProvider.FindValidOrigin(board.PlayAreaSize, shipSize,
+                ships.Select(x => x.ShipParts.Select(p => p.position).ToList()).ToList());
+            ships.Add(new Destroyer(GameGlobals.IdsProvider.New, board, shipOrigin, shipSize));
+
+            shipSize = GameGlobals.Random.Next() % 2 == 0 ? new Vector2DInt(3, 0) : new Vector2DInt(0, 3);
+            shipOrigin = GameGlobals.ShipPlacementProvider.FindValidOrigin(board.PlayAreaSize, shipSize,
+                ships.Select(x => x.ShipParts.Select(p => p.position).ToList()).ToList());
+            ships.Add(new Destroyer(GameGlobals.IdsProvider.New, board, shipOrigin, shipSize));
 
             return ships;
         }

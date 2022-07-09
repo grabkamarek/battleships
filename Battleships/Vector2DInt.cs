@@ -23,6 +23,11 @@
             return new Vector2DInt(a.X * multiplier, a.Y * multiplier);
         }
 
+        public static Vector2DInt operator *(int multiplier, Vector2DInt a)
+        {
+            return new Vector2DInt(a.X * multiplier, a.Y * multiplier);
+        }
+
         public static Vector2DInt operator *(Vector2DInt a, Vector2DInt b)
         {
             return new Vector2DInt(a.X * a.X, a.Y * b.Y);

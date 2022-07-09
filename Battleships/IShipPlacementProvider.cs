@@ -1,10 +1,10 @@
-﻿namespace Battleships;
-
-public interface IShipPlacementProvider
+﻿namespace Battleships
 {
-    Vector2DInt FindValidOrigin(
-        Vector2DInt boundsOrigin,
-        Vector2DInt boundsSize,
-        Vector2DInt shipSize,
-        IReadOnlyCollection<IReadOnlyCollection<Vector2DInt>> otherShips);
+    public interface IShipPlacementProvider
+    {
+        Vector2DInt FindValidOrigin(
+            Vector2DInt boundsSize,
+            Vector2DInt shipSize,
+            IReadOnlyCollection<IReadOnlyCollection<Vector2DInt>> otherShips);
+    }
 }

@@ -1,19 +1,20 @@
-﻿namespace Battleships;
-
-public abstract class GameObjectRenderer<T> : IGameObjectRenderer
-    where T : IGameObject
+﻿namespace Battleships
 {
-    /// <inheritdoc />
-    public void Render(IGameObject gameObject, IRenderer renderer)
+    public abstract class GameObjectRenderer<T> : IGameObjectRenderer
+        where T : IGameObject
     {
-        if (!gameObject.NeedsRender)
+        /// <inheritdoc />
+        public void Render(IGameObject gameObject, IRenderer renderer)
         {
-            return;
+            if (!gameObject.NeedsRender)
+            {
+                return;
+            }
+
+            Render((T)gameObject, renderer);
+            gameObject.NeedsRender = false;
         }
 
-        Render((T)gameObject, renderer);
-        gameObject.NeedsRender = false;
+        protected abstract void Render(T gameObject, IRenderer renderer);
     }
-
-    protected abstract void Render(T gameObject, IRenderer renderer);
 }

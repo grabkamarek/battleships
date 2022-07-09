@@ -1,10 +1,11 @@
-﻿namespace Battleships;
-
-public class Destroyer : Ship
+﻿namespace Battleships
 {
-    /// <inheritdoc />
-    public Destroyer(Guid id, Vector2DInt origin, Vector2DInt size)
-        : base(id, origin, ShipType.Destroyer, size)
+    public class Destroyer : Ship
     {
+        /// <inheritdoc />
+        public Destroyer(Guid id, Board board, Vector2DInt origin, Vector2DInt size)
+            : base(id, board, origin, ShipType.Destroyer, size, 'D')
+        {
+        }
     }
 }

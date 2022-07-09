@@ -1,7 +1,8 @@
-﻿namespace Battleships;
-
-public enum ShipOrientation
+﻿namespace Battleships
 {
-    Horizontal = 0,
-    Vertical = 1,
+    public enum ShipOrientation
+    {
+        Horizontal = 0,
+        Vertical = 1,
+    }
 }

@@ -1,6 +1,7 @@
-﻿namespace Battleships;
-
-public interface IGameObjectRenderer
+﻿namespace Battleships
 {
-    void Render(IGameObject gameObject, IRenderer renderer);
+    public interface IGameObjectRenderer
+    {
+        void Render(IGameObject gameObject, IRenderer renderer);
+    }
 }

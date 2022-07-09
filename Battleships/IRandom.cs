@@ -1,8 +1,9 @@
-﻿namespace Battleships;
-
-public interface IRandom
+﻿namespace Battleships
 {
-    int Next();
-    int Next(int maxValue);
-    int Next(int minValue, int maxValue);
+    public interface IRandom
+    {
+        int Next();
+        int Next(int maxValue);
+        int Next(int minValue, int maxValue);
+    }
 }
