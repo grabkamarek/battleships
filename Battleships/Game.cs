@@ -1,51 +1,37 @@
-﻿using Battleships.Core;
-using Battleships.GameObjects;
+﻿using Battleships.GameObjects;
 using Battleships.Rendering;
 
 namespace Battleships
 {
     public class Game
     {
-        private readonly IDateTimeProvider dateTimeProvider;
-
-        public readonly IRenderer renderer;
-        private readonly Dictionary<Type, IGameObjectRenderer> gameObjectRenderers;
-
-        public Game(IDateTimeProvider dateTimeProvider, IRenderer renderer, Dictionary<Type, IGameObjectRenderer> gameObjectRenderers)
+        public IRenderer Renderer
         {
-            this.dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
-            this.renderer = renderer ?? throw new ArgumentNullException(nameof(renderer));
+            get;
+        }
+
+        private readonly Dictionary<Type, IGameObjectRenderer> gameObjectRenderers;
+        private IPlayer? player1;
+        private IPlayer? player2;
+        private IPlayer? winner;
+
+        public Game(IRenderer renderer, Dictionary<Type, IGameObjectRenderer> gameObjectRenderers)
+        {
+            Renderer = renderer ?? throw new ArgumentNullException(nameof(renderer));
             this.gameObjectRenderers = gameObjectRenderers ?? throw new ArgumentNullException(nameof(gameObjectRenderers));
         }
 
         public void Run()
         {
-            var previous = dateTimeProvider.GetUtcNowMilliseconds();
-            var lag = 0.0;
-            while (true)
+            if (player1 is null || player2 is null)
             {
-                var current = dateTimeProvider.GetUtcNowMilliseconds();
-                var elapsed = current - previous;
-                previous = current;
-                lag += elapsed;
-
-                ProcessInput();
-
-                while (lag >= GameGlobals.MillisecondsPerUpdate)
-                {
-                    Update(elapsed);
-                    lag -= GameGlobals.MillisecondsPerUpdate;
-                }
-
-                Render();
+                throw new Exception("Cannot start game without 2 players.");
             }
-        }
 
-        private void Update(double deltaTime)
-        {
-            foreach (var gameObject in gameObjects)
+            while (winner is null)
             {
-                gameObject.Update(deltaTime);
+                Render();
+                ProcessInput();
             }
         }
 
@@ -61,13 +47,33 @@ namespace Battleships
 
                 foreach (var gameObject in group.Item2)
                 {
-                    gameObjectRenderer.Render(gameObject, renderer);
+                    gameObjectRenderer.Render(gameObject, Renderer);
                 }
             }
         }
 
         private void ProcessInput()
         {
+            if (Shoot(player1, player2))
+            {
+                winner = player1;
+                return;
+            }
+
+            if (!Shoot(player2, player1))
+            {
+                return;
+            }
+
+            winner = player2;
+        }
+
+        private static bool Shoot(IPlayer shootingPlayer, IPlayer shotAtPlayer)
+        {
+            var target = shootingPlayer.SelectTarget();
+            var result = shotAtPlayer.EvaluateShot(target);
+            shootingPlayer.ShotResultNotification(target, result);
+            return shotAtPlayer.AllShipsDestroyed;
         }
 
         private readonly List<IGameObject> gameObjects = new ();
@@ -80,6 +86,18 @@ namespace Battleships
             }
 
             gameObjects.Add(gameObject);
+        }
+
+        public void AddPlayer(IPlayer player)
+        {
+            if (player1 is null)
+            {
+                player1 = player;
+            }
+            else if (player2 is null)
+            {
+                player2 = player;
+            }
         }
     }
 }

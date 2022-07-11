@@ -24,6 +24,8 @@ namespace Battleships.GameObjects.Ships
             get;
         }
 
+        public bool Destroyed => shipParts.All(x => x.status == ShipPartStatus.Hit);
+
         protected readonly ShipPart[] shipParts;
 
         public IReadOnlyCollection<ShipPart> ShipParts => shipParts;
@@ -48,6 +50,28 @@ namespace Battleships.GameObjects.Ships
         {
             return Board.PlayAreaOrigin + new Vector2DInt(boardGridCoords.X * GameGlobals.ColumnWidth.X,
                 boardGridCoords.Y * Vector2DInt.Down.Y);
+        }
+
+        public ShotResult EvaluateShot(Vector2DInt target)
+        {
+            for (var i = 0; i < shipParts.Length; i++)
+            {
+                if (shipParts[i].position != target)
+                {
+                    continue;
+                }
+
+                if (shipParts[i].status == ShipPartStatus.Hit)
+                {
+                    return ShotResult.Miss;
+                }
+
+                shipParts[i] = new ShipPart(target, ShipPartStatus.Hit);
+                NeedsRender = true;
+                return ShotResult.Hit;
+            }
+
+            return ShotResult.Miss;
         }
     }
 }

@@ -36,10 +36,5 @@ namespace Battleships.GameObjects
             get;
             set;
         }
-
-        /// <inheritdoc />
-        public virtual void Update(double deltaTime)
-        {
-        }
     }
 }

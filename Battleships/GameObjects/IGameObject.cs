@@ -12,7 +12,5 @@ namespace Battleships.GameObjects
             get;
             set;
         }
-
-        void Update(double deltaTime);
     }
 }

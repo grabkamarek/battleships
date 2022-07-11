@@ -13,11 +13,7 @@ namespace Battleships
         {
             Console.OutputEncoding = Encoding.UTF8;
             var game = CreateGame();
-            var gameObjects = CreateGameObjects();
-            foreach (var gameObject in gameObjects)
-            {
-                game.AddGameObject(gameObject);
-            }
+            SetupGame(game);
 
             game.Run();
 
@@ -27,7 +23,7 @@ namespace Battleships
         private static Game CreateGame()
         {
             var shipRenderer = new ShipRenderer();
-            return new Game(new DateTimeProvider(), new ConsoleRenderer(), new Dictionary<Type, IGameObjectRenderer>
+            return new Game(new ConsoleRenderer(), new Dictionary<Type, IGameObjectRenderer>
             {
                 {
                     typeof(Label), new LabelRenderer()
@@ -87,7 +83,7 @@ namespace Battleships
             };
         }
 
-        private static IEnumerable<IGameObject> CreateGameObjects()
+        private static void SetupGame(Game game)
         {
             var gameObjects = new List<IGameObject>();
             gameObjects.AddRange(CreateLabels());
@@ -96,10 +92,27 @@ namespace Battleships
 
             foreach (var board in boards)
             {
-                gameObjects.AddRange(CreateShips(board));
+                var ships = CreateShips(board).ToList();
+                gameObjects.AddRange(ships);
+
+                ITargetSelectionStrategy strategy;
+                if (board.FogOfWarActive)
+                {
+                    strategy = new AiTargetSelectionStrategy(new SeekingStrategy(GameGlobals.Random),
+                        new PrecisionStrategy(GameGlobals.Random));
+                }
+                else
+                {
+                    //var promptLabel = new Label(GameGlobals.IdsProvider.New, new Vector2DInt(5, 20), "Select target: ");
+                    //var prompt = new UserPrompt(promptLabel);
+                    //gameObjects.Add(prompt);
+                    strategy = new ManualTargetSelectionStrategy(new UserPrompt(game.Renderer), new StringCoordsToVector2DIntConverter());
+                }
+
+                game.AddPlayer(new Player(strategy, ships, board.PlayAreaSize));
             }
-            
-            return gameObjects;
+
+            gameObjects.ForEach(game.AddGameObject);
         }
     }
 }
