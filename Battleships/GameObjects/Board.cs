@@ -1,5 +1,4 @@
 ﻿using Battleships.Core;
-using Battleships.GameObjects.Ships;
 
 namespace Battleships.GameObjects
 {
@@ -26,20 +25,6 @@ namespace Battleships.GameObjects
         public Vector2DInt PlayAreaSize
         {
             get;
-        }
-
-        private readonly List<Ship> ships = new List<Ship>();
-
-        public IReadOnlyCollection<Ship> Ships => ships;
-
-        public void AddShip(Ship ship)
-        {
-            if (ships.Any(x => x.Id == ship.Id))
-            {
-                throw new Exception($"Ship with id {ship.Id} already added.");
-            }
-
-            ships.Add(ship);
         }
     }
 }

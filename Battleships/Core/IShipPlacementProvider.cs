@@ -2,9 +2,10 @@
 {
     public interface IShipPlacementProvider
     {
-        Vector2DInt FindValidOrigin(
+        IReadOnlyCollection<Vector2DInt> FindValidShipCoords(
             Vector2DInt boundsSize,
-            Vector2DInt shipSize,
-            IReadOnlyCollection<IReadOnlyCollection<Vector2DInt>> otherShips);
+            bool isHorizontal,
+            int shipLength,
+            IReadOnlyCollection<Vector2DInt> otherShipsCoords);
     }
 }

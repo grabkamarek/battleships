@@ -2,7 +2,7 @@
 
 namespace Battleships.GameObjects.Ships
 {
-    public abstract class Ship : GameObject
+    public class Ship : GameObject
     {
         public Board Board
         {
@@ -19,11 +19,6 @@ namespace Battleships.GameObjects.Ships
             get;
         }
 
-        public ShipOrientation Orientation
-        {
-            get;
-        }
-
         public bool Destroyed => shipParts.All(x => x.status == ShipPartStatus.Hit);
 
         protected readonly ShipPart[] shipParts;
@@ -31,25 +26,13 @@ namespace Battleships.GameObjects.Ships
         public IReadOnlyCollection<ShipPart> ShipParts => shipParts;
 
         /// <inheritdoc />
-        protected Ship(Guid id, Board board, Vector2DInt origin, ShipType shipType, Vector2DInt size, char marker)
-            : base(id, origin, size)
+        public Ship(Guid id, Board board, ShipType shipType, IReadOnlyCollection<Vector2DInt> shipCoords, bool isHorizontal, char marker)
+            : base(id, shipCoords.ElementAt(0), isHorizontal ? new Vector2DInt(shipCoords.Count, 0) : new Vector2DInt(0, shipCoords.Count))
         {
             Board = board;
             ShipType = shipType;
             Marker = marker;
-            Orientation = size.X > 0 ? ShipOrientation.Horizontal : ShipOrientation.Vertical;
-            shipParts = new ShipPart[Orientation == ShipOrientation.Horizontal ? Size.X : Size.Y];
-            var current = BoardGridCoords2Absolute(Origin);
-            for (var i = 0; i < shipParts.Length; i++, current += Orientation == ShipOrientation.Horizontal ? GameGlobals.ColumnWidth : Vector2DInt.Down)
-            {
-                shipParts[i] = new ShipPart(current, ShipPartStatus.Ok);
-            }
-        }
-
-        private Vector2DInt BoardGridCoords2Absolute(Vector2DInt boardGridCoords)
-        {
-            return Board.PlayAreaOrigin + new Vector2DInt(boardGridCoords.X * GameGlobals.ColumnWidth.X,
-                boardGridCoords.Y * Vector2DInt.Down.Y);
+            shipParts = shipCoords.Select(x => new ShipPart(x, ShipPartStatus.Ok)).ToArray();
         }
 
         public ShotResult EvaluateShot(Vector2DInt target)

@@ -21,20 +21,20 @@ namespace Battleships.Rendering
 
         private static void DrawColumnHeaders(IGameObject gameObject, IRenderer renderer)
         {
+            var rowLetter = 'A';
             var current = gameObject.Origin + GameGlobals.ColumnWidth;
             for (var i = 0; i < gameObject.Size.X; i++, current += GameGlobals.ColumnWidth)
             {
-                renderer.Draw(current, $"[{i}]");
+                renderer.Draw(current, $"[{rowLetter++}]");
             }
         }
 
         private static void DrawRowsHeaders(IGameObject gameObject, IRenderer renderer)
         {
-            var rowLetter = 'A';
             var current = gameObject.Origin + Vector2DInt.Down;
             for (var i = 0; i < gameObject.Size.Y; i++, current += Vector2DInt.Down)
             {
-                renderer.Draw(current, $"[{rowLetter++}]");
+                renderer.Draw(current, $"[{i}]");
             }
         }
 

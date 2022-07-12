@@ -28,11 +28,20 @@ namespace Battleships
                 throw new Exception("Cannot start game without 2 players.");
             }
 
-            while (winner is null)
+            while (true)
             {
                 Render();
+                if (winner is not null)
+                {
+                    break;
+                }
+
                 ProcessInput();
             }
+
+            Console.Clear();
+
+            Console.WriteLine($"{(winner == player1 ? "You" : "AI")} won!");
         }
 
         private void Render()

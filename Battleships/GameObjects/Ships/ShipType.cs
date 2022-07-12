@@ -2,8 +2,13 @@
 {
     public enum ShipType
     {
-        Unknown = 0,
-        Battleship = 1,
-        Destroyer = 2
+        Battleship = 0,
+        Destroyer = 1
+    }
+
+    public static class ShipMarkers
+    {
+        public const char Battleship = 'B';
+        public const char Destroyer = 'D';
     }
 }

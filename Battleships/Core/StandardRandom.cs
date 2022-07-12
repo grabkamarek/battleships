@@ -30,5 +30,11 @@
         {
             return random.Next(minValue, maxValue);
         }
+
+        /// <inheritdoc />
+        public bool CoinFlip()
+        {
+            return random.Next() % 2 == 0;
+        }
     }
 }

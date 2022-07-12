@@ -1,16 +1,23 @@
-﻿using Battleships.GameObjects.Ships;
+﻿using Battleships.Core;
+using Battleships.GameObjects.Ships;
 
 namespace Battleships.Rendering
 {
     public class ShipRenderer : GameObjectRenderer<Ship>
     {
         /// <inheritdoc />
-        protected override void Render(Ship gameObject, IRenderer renderer)
+        protected override void Render(Ship ship, IRenderer renderer)
         {
-            var marker = $"[{gameObject.Marker}]";
-            foreach (var shipPart in gameObject.ShipParts)
+            var marker = $"[{ship.Marker}]";
+            foreach (var part in ship.ShipParts)
             {
-                renderer.Draw(shipPart.position, marker, shipPart.status == ShipPartStatus.Hit ? ConsoleColor.Red : ConsoleColor.Cyan);
+                var position = ship.Board.PlayAreaOrigin +
+                               part.position with
+                               {
+                                   X = part.position.X * GameGlobals.ColumnWidth.X
+                               };
+                var color = part.status == ShipPartStatus.Hit ? ConsoleColor.Red : ConsoleColor.Cyan;
+                renderer.Draw(position, marker, color);
             }
         }
     }

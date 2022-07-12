@@ -22,7 +22,6 @@ namespace Battleships
 
         private static Game CreateGame()
         {
-            var shipRenderer = new ShipRenderer();
             return new Game(new ConsoleRenderer(), new Dictionary<Type, IGameObjectRenderer>
             {
                 {
@@ -32,32 +31,38 @@ namespace Battleships
                     typeof(Board), new BoardRenderer()
                 },
                 {
-                    typeof(Battleship), shipRenderer
-                },
-                {
-                    typeof(Destroyer), shipRenderer
+                    typeof(Ship), new ShipRenderer()
                 },
             });
         }
 
         private static IEnumerable<Ship> CreateShips(Board board)
         {
+            var buildOrders = new[]
+            {
+                ShipType.Battleship, ShipType.Destroyer, ShipType.Destroyer
+            };
             var ships = new List<Ship>();
-
-            var shipSize = GameGlobals.Random.Next() % 2 == 0 ? new Vector2DInt(5, 0) : new Vector2DInt(0, 5);
-            var shipOrigin = GameGlobals.ShipPlacementProvider.FindValidOrigin(board.PlayAreaSize, shipSize,
-                ships.Select(x => x.ShipParts.Select(p => p.position).ToList()).ToList());
-            ships.Add(new Battleship(GameGlobals.IdsProvider.New, board, shipOrigin, shipSize));
-
-            shipSize = GameGlobals.Random.Next() % 2 == 0 ? new Vector2DInt(3, 0) : new Vector2DInt(0, 3);
-            shipOrigin = GameGlobals.ShipPlacementProvider.FindValidOrigin(board.PlayAreaSize, shipSize,
-                ships.Select(x => x.ShipParts.Select(p => p.position).ToList()).ToList());
-            ships.Add(new Destroyer(GameGlobals.IdsProvider.New, board, shipOrigin, shipSize));
-
-            shipSize = GameGlobals.Random.Next() % 2 == 0 ? new Vector2DInt(3, 0) : new Vector2DInt(0, 3);
-            shipOrigin = GameGlobals.ShipPlacementProvider.FindValidOrigin(board.PlayAreaSize, shipSize,
-                ships.Select(x => x.ShipParts.Select(p => p.position).ToList()).ToList());
-            ships.Add(new Destroyer(GameGlobals.IdsProvider.New, board, shipOrigin, shipSize));
+            var otherShipsCoords = new List<Vector2DInt>();
+            foreach (var shipType in buildOrders)
+            {
+                var isHorizontal = GameGlobals.Random.CoinFlip();
+                var shipLength = shipType == ShipType.Battleship ? 5 : 4;
+                var shipCoords = GameGlobals.ShipPlacementProvider.FindValidShipCoords(
+                    board.PlayAreaSize,
+                    isHorizontal,
+                    shipLength,
+                    otherShipsCoords);
+                otherShipsCoords.AddRange(shipCoords);
+                ships.Add(
+                    new Ship(
+                        GameGlobals.IdsProvider.New,
+                        board,
+                        shipType,
+                        shipCoords,
+                        isHorizontal,
+                        shipType == ShipType.Battleship ? ShipMarkers.Battleship : ShipMarkers.Destroyer));
+            }
 
             return ships;
         }
