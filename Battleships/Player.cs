@@ -1,30 +1,23 @@
-﻿using Battleships.Core;
+﻿using Battleships.Battle;
+using Battleships.Battle.Strategies;
+using Battleships.GameObjects;
 using Battleships.GameObjects.Ships;
+using Battleships.Services;
 
 namespace Battleships
 {
     public class Player : IPlayer
     {
-        private readonly Vector2DInt boardSize;
         private readonly ITargetSelectionStrategy targetSelectionStrategy;
-        private readonly List<Vector2DInt> fogOfWar = new();
-        private readonly List<Vector2DInt> misses = new();
+        private readonly FogOfWar fogOfWar;
         private readonly List<Vector2DInt> hits = new();
-        private readonly List<Vector2DInt> destroyed = new();
 
         public Player(ITargetSelectionStrategy targetSelectionStrategy, IReadOnlyCollection<Ship> ships,
-            Vector2DInt boardSize)
+            FogOfWar fogOfWar)
         {
             Ships = ships;
             this.targetSelectionStrategy = targetSelectionStrategy;
-            this.boardSize = boardSize;
-            for (var x = 0; x < boardSize.X; x++)
-            {
-                for (var y = 0; y < boardSize.Y; y++)
-                {
-                    fogOfWar.Add(new Vector2DInt(x, y));
-                }
-            }
+            this.fogOfWar = fogOfWar;
         }
 
         /// <inheritdoc />
@@ -41,8 +34,8 @@ namespace Battleships
         {
             var selectionArgs = new TargetSelectionStrategyArguments
             {
-                BoardSize = boardSize,
-                FogOfWar = fogOfWar,
+                BoardSize = fogOfWar.Size,
+                FogOfWar = fogOfWar.Coordinates,
                 Hits = hits
             };
             return targetSelectionStrategy.SelectTarget(selectionArgs);
@@ -56,11 +49,10 @@ namespace Battleships
                 case ShotResult.Unknown:
                     break;
                 case ShotResult.Miss:
-                    fogOfWar.Remove(position);
-                    misses.Add(position);
+                    fogOfWar.RemoveCoordinate(position);
                     break;
                 case ShotResult.Hit:
-                    fogOfWar.Remove(position);
+                    fogOfWar.RemoveCoordinate(position);
                     hits.Add(position);
                     break;
                 default:
@@ -76,8 +68,6 @@ namespace Battleships
             {
                 hits.Remove(shipCoord);
             }
-
-            destroyed.AddRange(result.DestroyedShipCoords);
         }
 
         /// <inheritdoc />

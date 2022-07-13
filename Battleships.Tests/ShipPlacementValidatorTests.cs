@@ -1,4 +1,4 @@
-using Battleships.Core;
+using Battleships.Services;
 using Battleships.Tests.ShipPlacementValidatorTestCases;
 using NUnit.Framework;
 

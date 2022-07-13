@@ -1,5 +1,5 @@
-﻿using Battleships.Core;
-using Battleships.GameObjects.Ships;
+﻿using Battleships.GameObjects.Ships;
+using Battleships.Services;
 
 namespace Battleships.Rendering
 {
@@ -14,7 +14,7 @@ namespace Battleships.Rendering
                 var position = ship.Board.PlayAreaOrigin +
                                part.position with
                                {
-                                   X = part.position.X * GameGlobals.ColumnWidth.X
+                                   X = part.position.X * GameConstants.ColumnWidth.X
                                };
                 var color = part.status == ShipPartStatus.Hit ? ConsoleColor.Red : ConsoleColor.Cyan;
                 renderer.Draw(position, marker, color);

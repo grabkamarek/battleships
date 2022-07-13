@@ -1,49 +1,47 @@
 ﻿using Battleships.GameObjects;
 
 using System.Text;
-using Battleships.Core;
+using Battleships.Services;
 
 namespace Battleships.Rendering
 {
     public class BoardRenderer : GameObjectRenderer<Board>
     {
         /// <inheritdoc />
-        protected override void Render(Board gameObject, IRenderer renderer)
+        protected override void Render(Board board, IRenderer renderer)
         {
-            DrawColumnHeaders(gameObject, renderer);
-            DrawRowsHeaders(gameObject, renderer);
-            DrawWater(gameObject, renderer);
-            if (gameObject.FogOfWarActive)
-            {
-                DrawFogOfWar(gameObject, renderer);
-            }
+            DrawColumnHeaders(board.Origin, board.Size.X, renderer);
+            DrawColumnHeaders(board.Origin + Vector2DInt.Down * (board.Size.Y + 1), board.Size.X, renderer);
+            DrawRowsHeaders(board.Origin, board.Size.Y, renderer);
+            DrawRowsHeaders(board.Origin + GameConstants.ColumnWidth * (board.Size.X + 1), board.Size.Y, renderer);
+            DrawWater(board, renderer);
         }
 
-        private static void DrawColumnHeaders(IGameObject gameObject, IRenderer renderer)
+        private static void DrawColumnHeaders(Vector2DInt position, int columnCount, IRenderer renderer)
         {
             var rowLetter = 'A';
-            var current = gameObject.Origin + GameGlobals.ColumnWidth;
-            for (var i = 0; i < gameObject.Size.X; i++, current += GameGlobals.ColumnWidth)
+            var current = position + GameConstants.ColumnWidth;
+            for (var i = 0; i < columnCount; i++, current += GameConstants.ColumnWidth)
             {
                 renderer.Draw(current, $"[{rowLetter++}]");
             }
         }
 
-        private static void DrawRowsHeaders(IGameObject gameObject, IRenderer renderer)
+        private static void DrawRowsHeaders(Vector2DInt position, int rowsCount, IRenderer renderer)
         {
-            var current = gameObject.Origin + Vector2DInt.Down;
-            for (var i = 0; i < gameObject.Size.Y; i++, current += Vector2DInt.Down)
+            var current = position + Vector2DInt.Down;
+            for (var i = 0; i < rowsCount; i++, current += Vector2DInt.Down)
             {
                 renderer.Draw(current, $"[{i}]");
             }
         }
 
         private const string Water = "~~~";
-        private static void DrawWater(IGameObject gameObject, IRenderer renderer)
+        private static void DrawWater(IGameObject board, IRenderer renderer)
         {
-            var current = gameObject.Origin + Vector2DInt.Down + GameGlobals.ColumnWidth;
-            var waterRow = MakeBetterWater(CreateRowOf(Water, gameObject.Size.X));
-            for (var i = 0; i < gameObject.Size.Y; i++, current += Vector2DInt.Down)
+            var current = board.Origin + Vector2DInt.Down + GameConstants.ColumnWidth;
+            var waterRow = MakeBetterWater(CreateRowOf(Water, board.Size.X));
+            for (var i = 0; i < board.Size.Y; i++, current += Vector2DInt.Down)
             {
                 renderer.Draw(current, waterRow);
             }
@@ -58,17 +56,6 @@ namespace Battleships.Rendering
             }
 
             return new string(chars);
-        }
-
-        private static string Fog = "\u2591\u2591\u2591";
-        private static void DrawFogOfWar(IGameObject gameObject, IRenderer renderer)
-        {
-            var current = gameObject.Origin + Vector2DInt.Down + GameGlobals.ColumnWidth;
-            var waterRow = CreateRowOf(Fog, gameObject.Size.X);
-            for (var i = 0; i < gameObject.Size.Y; i++, current += Vector2DInt.Down)
-            {
-                renderer.Draw(current, waterRow);
-            }
         }
 
         private static string CreateRowOf(string text, int length)

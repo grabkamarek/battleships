@@ -1,4 +1,5 @@
-﻿using Battleships.GameObjects;
+﻿using System.Diagnostics.CodeAnalysis;
+using Battleships.GameObjects;
 using Battleships.Rendering;
 
 namespace Battleships
@@ -23,10 +24,7 @@ namespace Battleships
 
         public void Run()
         {
-            if (player1 is null || player2 is null)
-            {
-                throw new Exception("Cannot start game without 2 players.");
-            }
+            ThrowIfAnyPlayerIsNull();
 
             while (true)
             {
@@ -63,6 +61,8 @@ namespace Battleships
 
         private void ProcessInput()
         {
+            ThrowIfAnyPlayerIsNull();
+
             if (Shoot(player1, player2))
             {
                 winner = player1;
@@ -89,6 +89,11 @@ namespace Battleships
 
         public void AddGameObject(IGameObject gameObject)
         {
+            if (gameObject == null)
+            {
+                throw new ArgumentNullException(nameof(gameObject));
+            }
+
             if (gameObjects.Any(x => x.Id == gameObject.Id))
             {
                 throw new Exception($"Game object with id {gameObject.Id} already added.");
@@ -99,6 +104,11 @@ namespace Battleships
 
         public void AddPlayer(IPlayer player)
         {
+            if (player == null)
+            {
+                throw new ArgumentNullException(nameof(player));
+            }
+
             if (player1 is null)
             {
                 player1 = player;
@@ -106,6 +116,16 @@ namespace Battleships
             else if (player2 is null)
             {
                 player2 = player;
+            }
+        }
+
+        [MemberNotNull(nameof(player1))]
+        [MemberNotNull(nameof(player2))]
+        private void ThrowIfAnyPlayerIsNull()
+        {
+            if (player1 is null || player2 is null)
+            {
+                throw new Exception("Game cannot run without 2 players set. You can add player using Game.AddPlayer method.");
             }
         }
     }

@@ -1,16 +1,16 @@
-﻿namespace Battleships.Core
+﻿namespace Battleships.Services
 {
     public class StandardRandom : IRandom
     {
         private readonly Random random;
-        public StandardRandom(int seed)
+        private StandardRandom(int seed)
         {
             random = new Random(seed);
         }
 
-        public StandardRandom()
+        public static IRandom Create(int? seed = null)
         {
-            random = new Random();
+            return new StandardRandom(seed ?? (int)(DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond));
         }
 
         /// <inheritdoc />

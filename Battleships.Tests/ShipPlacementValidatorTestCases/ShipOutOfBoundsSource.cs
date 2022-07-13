@@ -1,5 +1,5 @@
 using System.Collections;
-using Battleships.Core;
+using Battleships.Services;
 
 namespace Battleships.Tests.ShipPlacementValidatorTestCases;
 

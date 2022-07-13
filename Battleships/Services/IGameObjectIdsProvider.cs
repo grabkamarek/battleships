@@ -1,4 +1,4 @@
-﻿namespace Battleships.Core
+﻿namespace Battleships.Services
 {
     public interface IGameObjectIdsProvider
     {

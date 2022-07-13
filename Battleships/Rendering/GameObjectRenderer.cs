@@ -8,11 +8,6 @@ namespace Battleships.Rendering
         /// <inheritdoc />
         public void Render(IGameObject gameObject, IRenderer renderer)
         {
-            if (!gameObject.NeedsRender)
-            {
-                return;
-            }
-
             Render((T)gameObject, renderer);
             gameObject.NeedsRender = false;
         }

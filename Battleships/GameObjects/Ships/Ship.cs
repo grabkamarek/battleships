@@ -1,4 +1,5 @@
-﻿using Battleships.Core;
+﻿using Battleships.Battle;
+using Battleships.Services;
 
 namespace Battleships.GameObjects.Ships
 {

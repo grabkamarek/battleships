@@ -1,4 +1,4 @@
-﻿namespace Battleships.Core
+﻿namespace Battleships.Services
 {
     public readonly record struct Vector2DInt(int X, int Y)
     {

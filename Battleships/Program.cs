@@ -3,7 +3,8 @@ using Battleships.GameObjects.Ships;
 using Battleships.Rendering;
 
 using System.Text;
-using Battleships.Core;
+using Battleships.Battle.Strategies;
+using Battleships.Services;
 
 namespace Battleships
 {
@@ -13,7 +14,7 @@ namespace Battleships
         {
             Console.OutputEncoding = Encoding.UTF8;
             var game = CreateGame();
-            SetupGame(game);
+            SetupGame(game, new GameObjectIdsProvider(), StandardRandom.Create());
 
             game.Run();
 
@@ -33,10 +34,13 @@ namespace Battleships
                 {
                     typeof(Ship), new ShipRenderer()
                 },
+                {
+                    typeof(FogOfWar), new FogOfWarRenderer()
+                }
             });
         }
 
-        private static IEnumerable<Ship> CreateShips(Board board)
+        private static IEnumerable<Ship> CreateShips(Board board, IGameObjectIdsProvider gameObjectIdsProvider, IRandom randomizer)
         {
             var buildOrders = new[]
             {
@@ -44,11 +48,12 @@ namespace Battleships
             };
             var ships = new List<Ship>();
             var otherShipsCoords = new List<Vector2DInt>();
+            var placementProvider = new ShipPlacementProvider(randomizer, new ShipPlacementValidator());
             foreach (var shipType in buildOrders)
             {
-                var isHorizontal = GameGlobals.Random.CoinFlip();
+                var isHorizontal = randomizer.CoinFlip();
                 var shipLength = shipType == ShipType.Battleship ? 5 : 4;
-                var shipCoords = GameGlobals.ShipPlacementProvider.FindValidShipCoords(
+                var shipCoords = placementProvider.FindValidShipCoords(
                     board.PlayAreaSize,
                     isHorizontal,
                     shipLength,
@@ -56,7 +61,7 @@ namespace Battleships
                 otherShipsCoords.AddRange(shipCoords);
                 ships.Add(
                     new Ship(
-                        GameGlobals.IdsProvider.New,
+                        gameObjectIdsProvider.New,
                         board,
                         shipType,
                         shipCoords,
@@ -67,54 +72,48 @@ namespace Battleships
             return ships;
         }
 
-        private static IReadOnlyCollection<Board> CreateBoards()
-        {
-            return new List<Board>
-            {
-                new Board(GameGlobals.IdsProvider.New, new Vector2DInt(5, 4), 10, 10),
-                new Board(GameGlobals.IdsProvider.New, new Vector2DInt(45, 4), 10, 10)
-                {
-                    FogOfWarActive = true
-                }
-            };
-        }
-
-        private static IEnumerable<Label> CreateLabels()
+        private static IEnumerable<Label> CreateLabels(IGameObjectIdsProvider gameObjectIdsProvider)
         {
             return new List<Label>
             {
-                new Label(GameGlobals.IdsProvider.New, new Vector2DInt(18, 2), "Your board"),
-                new Label(GameGlobals.IdsProvider.New, new Vector2DInt(55, 2), "Opponent's board"),
+                new Label(gameObjectIdsProvider.New, new Vector2DInt(18, 2), "Your board"),
+                new Label(gameObjectIdsProvider.New, new Vector2DInt(55, 2), "Opponent's board"),
             };
         }
 
-        private static void SetupGame(Game game)
+        private static void SetupGame(Game game, IGameObjectIdsProvider gameObjectIdsProvider, IRandom randomizer)
         {
             var gameObjects = new List<IGameObject>();
-            gameObjects.AddRange(CreateLabels());
-            var boards = CreateBoards();
-            gameObjects.AddRange(boards);
+            gameObjects.AddRange(CreateLabels(gameObjectIdsProvider));
 
-            foreach (var board in boards)
+            for (var i = 0; i < 2; i++)
             {
-                var ships = CreateShips(board).ToList();
+                var boardOrigin = new Vector2DInt(i == 0 ? 5 : 45, 4);
+                const int boardPlayAreaSideLength = 10;
+                var board = new Board(gameObjectIdsProvider.New, boardOrigin, boardPlayAreaSideLength, boardPlayAreaSideLength);
+                gameObjects.Add(board);
+                var ships = CreateShips(board, gameObjectIdsProvider, randomizer).ToList();
                 gameObjects.AddRange(ships);
 
                 ITargetSelectionStrategy strategy;
-                if (board.FogOfWarActive)
+                if (i == 0)
                 {
-                    strategy = new AiTargetSelectionStrategy(new SeekingStrategy(GameGlobals.Random),
-                        new PrecisionStrategy(GameGlobals.Random));
+                    strategy = new ManualTargetSelectionStrategy(new UserPrompt(game.Renderer), new StringCoordsToVector2DIntConverter());
                 }
                 else
                 {
-                    //var promptLabel = new Label(GameGlobals.IdsProvider.New, new Vector2DInt(5, 20), "Select target: ");
-                    //var prompt = new UserPrompt(promptLabel);
-                    //gameObjects.Add(prompt);
-                    strategy = new ManualTargetSelectionStrategy(new UserPrompt(game.Renderer), new StringCoordsToVector2DIntConverter());
+                    strategy = new AiTargetSelectionStrategy(new SeekingStrategy(randomizer),
+                        new PrecisionStrategy(randomizer));
                 }
 
-                game.AddPlayer(new Player(strategy, ships, board.PlayAreaSize));
+                var fogOfWarOrigin = new Vector2DInt(i == 1 ? 5 : 45, 4) + GameConstants.ColumnWidth + Vector2DInt.Down;
+                var fogOfWar = new FogOfWar(gameObjectIdsProvider.New, fogOfWarOrigin, new Vector2DInt(boardPlayAreaSideLength, boardPlayAreaSideLength));
+                if (i == 0)
+                {
+                    gameObjects.Add(fogOfWar);
+                }
+
+                game.AddPlayer(new Player(strategy, ships, fogOfWar));
             }
 
             gameObjects.ForEach(game.AddGameObject);

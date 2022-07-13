@@ -1,4 +1,4 @@
-﻿using Battleships.Core;
+﻿using Battleships.Services;
 
 namespace Battleships.GameObjects
 {
@@ -7,7 +7,7 @@ namespace Battleships.GameObjects
         public Board(Guid id, Vector2DInt origin, int width, int height)
             : base(id, origin, new Vector2DInt(width, height))
         {
-            PlayAreaOrigin = Origin + GameGlobals.ColumnWidth + Vector2DInt.Down;
+            PlayAreaOrigin = Origin + GameConstants.ColumnWidth + Vector2DInt.Down;
             PlayAreaSize = Size;
         }
 
